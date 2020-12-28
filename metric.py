@@ -17,7 +17,7 @@ def get_recall(indices, targets):
     hits = torch.nonzero(targets == indices, as_tuple=False)
     if len(hits) == 0:
         return 0
-    n_hits = (targets == indices).nonzero()[:, :-1].size(0)
+    n_hits = torch.nonzero(targets == indices, as_tuple=False)[:, :-1].size(0)
     recall = float(n_hits) / targets.size(0)
     return recall
 
@@ -35,7 +35,7 @@ def get_mrr(indices, targets):
 
     tmp = targets.view(-1, 1)
     targets = tmp.expand_as(indices)
-    hits = (targets == indices).nonzero()
+    hits = torch.nonzero(targets == indices, as_tuple=False)
     ranks = hits[:, -1] + 1
     ranks = ranks.float()
     rranks = torch.reciprocal(ranks)
