@@ -26,17 +26,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='diginetica', help='dataset name')
 args = parser.parse_args()
 
-# add a header for yoochoose dataset
-with open('yoochoose-clicks.dat', 'r') as f, open('yoochoose-clicks-withHeader.dat', 'w') as fn:
-    fn.write('sessionId,timestamp,itemId,category'+'\n')
-    for line in f:
-        fn.write(line)
-
 if args.dataset == 'diginetica':
     dataset = 'train-item-views.csv'
 elif args.dataset =='yoochoose':
-    dataset = 'yoochoose-clicks-withHeader.dat'
-
+    dataset = 'yoochoose-clicks.dat'
 
 print("-- Starting @ %ss" % datetime.datetime.now())
 with open(dataset, "r") as f:

@@ -14,7 +14,7 @@ def get_recall(indices, targets):
     """
 
     targets = targets.view(-1, 1).expand_as(indices)
-    hits = (targets == indices).nonzero()
+    hits = torch.nonzero(targets == indices, as_tuple=False)
     if len(hits) == 0:
         return 0
     n_hits = (targets == indices).nonzero()[:, :-1].size(0)

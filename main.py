@@ -68,7 +68,7 @@ def main():
     model = NARM(n_items, args.hidden_size, args.embed_dim, args.batch_size).to(device)
 
     if args.test:
-        ckpt = torch.load('latest_checkpoint.pth.tar')
+        ckpt = torch.load(args.dataset_path + 'latest_checkpoint.pth.tar')
         model.load_state_dict(ckpt['state_dict'])
         recall, mrr = validate(test_loader, model)
         print("Test: Recall@{}: {:.4f}, MRR@{}: {:.4f}".format(args.topk, recall, args.topk, mrr))
@@ -80,7 +80,6 @@ def main():
 
     for epoch in tqdm(range(args.epoch)):
         # train for one epoch
-        scheduler.step(epoch = epoch)
         trainForEpoch(train_loader, model, optimizer, epoch, args.epoch, criterion, log_aggr = 200)
 
         recall, mrr = validate(valid_loader, model)
@@ -93,8 +92,8 @@ def main():
             'optimizer': optimizer.state_dict()
         }
 
-        torch.save(ckpt_dict, 'latest_checkpoint.pth.tar')
-
+        torch.save(ckpt_dict, args.dataset_path + 'latest_checkpoint.pth.tar')
+        scheduler.step()
 
 def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, log_aggr=1):
     model.train()
