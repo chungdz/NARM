@@ -128,21 +128,28 @@ def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, 
 
 def validate(valid_loader, model):
     model.eval()
-    recalls = []
-    mrrs = []
+    hit, mrr = [], []
     with torch.no_grad():
-        for seq, target, lens in tqdm(valid_loader):
+        for seq, targets, lens in tqdm(valid_loader):
             seq = seq.to(device)
-            target = target.to(device)
-            outputs = model(seq, lens)
-            logits = F.softmax(outputs, dim = 1)
-            recall, mrr = metric.evaluate(logits, target, k = args.topk)
-            recalls.append(recall)
-            mrrs.append(mrr)
+            targets = targets.to(device)
+            scores = model(seq, lens)
+            # logits = F.softmax(outputs, dim = 1)
+            # recall, mrr = metric.evaluate(logits, target, k = args.topk)
+            # recalls.append(recall)
+            # mrrs.append(mrr)
+            sub_scores = scores.topk(args.topk)[1]    # batch * top_k
+            for score, target in zip(sub_scores.detach().cpu().numpy(), targets.detach().cpu().numpy()):
+                hit.append(np.isin(target, score))
+                if len(np.where(score == target)[0]) == 0:
+                    mrr.append(0)
+                else:
+                    mrr.append(1 / (np.where(score == target)[0][0] + 1))
     
-    mean_recall = np.mean(recalls)
-    mean_mrr = np.mean(mrrs)
-    return mean_recall, mean_mrr
+    hit = np.mean(hit) * 100
+    mrr = np.mean(mrr) * 100
+
+    return hit, mrr
 
 
 if __name__ == '__main__':
