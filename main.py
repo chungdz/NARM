@@ -62,6 +62,8 @@ def main():
         n_items = 43098
     elif args.dataset_path.split('/')[-2] in ['yoochoose1_64', 'yoochoose1_4']:
         n_items = 37484
+    elif args.dataset_path.split('/')[-2] == 'diginetica':
+        n_items = 48624
     else:
         raise Exception('Unknown Dataset!')
 
